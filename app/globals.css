@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-orange: #FF6A00;
+  --color-brand-purple: #6C2BFF;
+  --color-background: #000000;
+  --color-foreground: #FFFFFF;
+  --color-card: #111111;
+  --color-card-foreground: #FFFFFF;
+  --color-popover: #111111;
+  --color-popover-foreground: #FFFFFF;
+  --color-primary: #FF6A00;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #6C2BFF;
+  --color-secondary-foreground: #FFFFFF;
+  --color-muted: #27272A;
+  --color-muted-foreground: #A1A1AA;
+  --color-accent: #27272A;
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: #7F1D1D;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #27272A;
+  --color-input: #27272A;
+  --color-ring: #FF6A00;
+  --radius-lg: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
