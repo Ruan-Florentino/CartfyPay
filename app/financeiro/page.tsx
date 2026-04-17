@@ -1,10 +1,22 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ChevronLeft, ArrowDownToLine, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, Wallet, Building2, TrendingUp, AlertCircle } from "lucide-react";
+import { ChevronLeft, ArrowDownToLine, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, Wallet, Building2, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useVendas } from "@/hooks/use-vendas";
 
 export default function Financial() {
+  const { vendas, metricas, loading } = useVendas('todos');
+
+  // Calculate available balance (approved sales)
+  const saldoDisponivel = metricas.faturamento;
+  
+  // Calculate pending balance (pending sales)
+  const saldoPendente = vendas.filter(v => v.status === 'pendente').reduce((acc, curr) => acc + curr.valor, 0);
+
+  // Calculate fees (e.g., 5% fee for platform)
+  const taxas = saldoDisponivel * 0.05;
+
   const history = [
     { id: "SAQ-1029", type: "withdraw", amount: "R$ 5.000,00", status: "completed", date: "Hoje, 14:30", account: "Nubank final 4021" },
     { id: "SAQ-1028", type: "withdraw", amount: "R$ 12.450,00", status: "completed", date: "18 Mar, 09:15", account: "Itaú final 8829" },
@@ -32,10 +44,18 @@ export default function Financial() {
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0B0B0F] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0B0B0F] pb-32 relative">
       {/* Background Glow */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-gradient-to-b from-[#FF6A00]/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-gradient-to-b from-[#FF5F00]/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
 
       {/* Header */}
       <div className="p-6 pt-12 flex items-center gap-4 sticky top-0 bg-[#0B0B0F]/80 backdrop-blur-xl z-40 border-b border-white/5 shadow-sm">
@@ -49,7 +69,7 @@ export default function Financial() {
           </motion.div>
         </Link>
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Financeiro</h1>
+          <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Financeiro</h1>
           <p className="text-zinc-400 text-sm mt-1 font-medium">Gerencie seus ganhos</p>
         </div>
       </div>
@@ -63,7 +83,7 @@ export default function Financial() {
         {/* Balance Card */}
         <motion.div
           variants={itemVariants}
-          className="bg-gradient-to-br from-[#FF6A00] to-[#6C2BFF] p-8 rounded-[2.5rem] relative overflow-hidden shadow-[0_20px_50px_rgba(255,106,0,0.3)]"
+          className="bg-gradient-to-br from-[#FF5F00] to-[#6C2BFF] p-8 rounded-[2.5rem] relative overflow-hidden shadow-[0_20px_50px_rgba(255,106,0,0.3)]"
         >
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
@@ -81,7 +101,9 @@ export default function Financial() {
               </div>
             </div>
             
-            <h2 className="text-5xl font-black text-white tracking-tight mb-8">R$ 14.590<span className="text-3xl text-white/70">,00</span></h2>
+            <h2 className="text-5xl font-bold tracking-[-0.02em] text-white tracking-tight mb-8">
+              R$ {saldoDisponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </h2>
 
             <div className="flex gap-4">
               <div className="flex-1 bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/10">
@@ -89,14 +111,18 @@ export default function Financial() {
                   <Clock size={12} className="text-white/70" />
                   <p className="text-white/70 text-xs">A liberar</p>
                 </div>
-                <p className="text-white font-bold text-lg">R$ 3.240,50</p>
+                <p className="text-white font-bold text-lg">
+                  R$ {saldoPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
               </div>
               <div className="flex-1 bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/10">
                 <div className="flex items-center gap-1 mb-1">
                   <AlertCircle size={12} className="text-white/70" />
                   <p className="text-white/70 text-xs">Taxas (Mês)</p>
                 </div>
-                <p className="text-white font-bold text-lg">R$ 145,20</p>
+                <p className="text-white font-bold text-lg">
+                  R$ {taxas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
               </div>
             </div>
           </div>
@@ -130,7 +156,7 @@ export default function Financial() {
         <motion.div variants={itemVariants} className="space-y-4 pt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-white">Histórico de Saques</h3>
-            <button className="text-sm font-bold text-[#FF6A00] hover:underline">Ver todos</button>
+            <button className="text-sm font-bold text-[#FF5F00] hover:underline">Ver todos</button>
           </div>
           
           <div className="space-y-3">

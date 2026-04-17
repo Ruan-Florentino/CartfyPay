@@ -13,7 +13,7 @@ export default function Onboarding() {
       title: "Venda mais com a Cartfy",
       description: "A plataforma mais premium e conversiva para seus infoprodutos. Tudo na palma da sua mão.",
       icon: TrendingUp,
-      color: "from-[#FF6A00] to-[#FF8C00]",
+      color: "from-[#FF5F00] to-[#FF8C00]",
       glow: "shadow-[0_0_40px_rgba(255,106,0,0.5)]",
     },
     {
@@ -69,7 +69,7 @@ export default function Onboarding() {
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-3xl font-black tracking-tight text-white leading-tight">
+              <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white leading-tight">
                 {slides[step].title}
               </h1>
               <p className="text-zinc-400 text-base leading-relaxed max-w-[280px] mx-auto">

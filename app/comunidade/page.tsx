@@ -1,67 +1,92 @@
 "use client";
 
 import { motion } from "motion/react";
-import { MessageSquare, Heart, Share2, MoreHorizontal, Image as ImageIcon, Send, Sparkles, Flame, Trophy, Award, Pin, Trash2, Edit2, BellRing } from "lucide-react";
+import { MessageSquare, Heart, Share2, MoreHorizontal, Image as ImageIcon, Send, Sparkles, Flame, Trophy, Award, Pin, Trash2, Edit2, BellRing, Users } from "lucide-react";
 import { useState } from "react";
 import { useMode } from "@/lib/mode-context";
+import { useCommunity } from "@/contexts/community-context";
 
 export default function Comunidade() {
   const { mode } = useMode();
-  const [likedPosts, setLikedPosts] = useState<number[]>([]);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [newCommentContent, setNewCommentContent] = useState("");
+  const [replyingTo, setReplyingTo] = useState<{ postId: string, commentId: string, author: string } | null>(null);
+  const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [isNotice, setIsNotice] = useState(false);
+  const [newPostContent, setNewPostContent] = useState("");
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostImage, setNewPostImage] = useState("");
+  const [newPostVideo, setNewPostVideo] = useState("");
+  const [newPostLink, setNewPostLink] = useState("");
+  const [showExtraFields, setShowExtraFields] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const { posts, addPost, deletePost, editPost, togglePin, likePost, addComment, likeComment, replyComment } = useCommunity();
 
-  const posts = [
-    {
-      id: 1,
-      author: "João Silva",
-      role: "Professor",
-      avatar: "https://i.pravatar.cc/150?img=11",
-      time: "Há 2 horas",
-      content: "Nova aula liberada no módulo de Tráfego Pago! Confiram as atualizações da plataforma de anúncios. Deixem nos comentários o que acharam da nova interface.",
-      likes: 156,
-      comments: 32,
-      hasImage: true,
-      image: "https://picsum.photos/seed/ads/800/400",
-      badges: ["Autor"],
-      isPinned: true,
-      isNotice: true,
-    },
-    {
-      id: 2,
-      author: "Carlos Eduardo",
-      role: "Aluno",
-      avatar: "https://i.pravatar.cc/150?img=33",
-      time: "Há 5 horas",
-      content: "Pessoal, acabei de aplicar a estratégia do módulo 3 e já fiz minha primeira venda! Muito obrigado João pelo conteúdo incrível. Alguém mais teve resultados rápidos assim?",
-      likes: 24,
-      comments: 5,
-      hasImage: false,
-      badges: ["Primeira Venda"],
-      isPinned: false,
-      isNotice: false,
-    },
-    {
-      id: 3,
-      author: "Beatriz Lima",
-      role: "Aluna",
-      avatar: "https://i.pravatar.cc/150?img=44",
-      time: "Ontem",
-      content: "Alguém tem alguma dica para melhorar a conversão do checkout? Minha taxa de abandono está alta e não sei mais o que testar.",
-      likes: 12,
-      comments: 8,
-      hasImage: false,
-      badges: ["Top Contribuidor"],
-      isPinned: false,
-      isNotice: false,
-    },
-  ];
+  const handleEdit = (post: any) => {
+    setEditingPostId(post.id);
+    setEditContent(post.content);
+  };
 
-  const handleLike = (id: number) => {
+  const handleSaveEdit = (id: string) => {
+    if (!editContent.trim()) return;
+    editPost(id, editContent);
+    setEditingPostId(null);
+    setEditContent("");
+  };
+
+  const handleLike = (id: string) => {
     if (likedPosts.includes(id)) {
       setLikedPosts(likedPosts.filter(postId => postId !== id));
     } else {
       setLikedPosts([...likedPosts, id]);
+      likePost(id);
     }
+  };
+
+  const handlePublishComment = (postId: string) => {
+    if (!newCommentContent.trim()) return;
+    
+    if (replyingTo && replyingTo.postId === postId) {
+      replyComment(postId, replyingTo.commentId, {
+        author: mode === 'vendedor' ? "Professor" : "Aluno",
+        avatar: "https://i.pravatar.cc/150?img=11",
+        content: newCommentContent,
+      });
+      setReplyingTo(null);
+    } else {
+      addComment(postId, {
+        author: mode === 'vendedor' ? "Professor" : "Aluno",
+        avatar: "https://i.pravatar.cc/150?img=11",
+        content: newCommentContent,
+      });
+    }
+    setNewCommentContent("");
+  };
+
+  const handlePublish = () => {
+    if (!newPostContent.trim()) return;
+    addPost({
+      author: mode === 'vendedor' ? "Professor" : "Aluno",
+      role: mode === 'vendedor' ? "Professor" : "Aluno",
+      avatar: "https://i.pravatar.cc/150?img=11",
+      title: newPostTitle.trim() || undefined,
+      content: newPostContent,
+      hasImage: !!newPostImage.trim(),
+      image: newPostImage.trim() || undefined,
+      video: newPostVideo.trim() || undefined,
+      link: newPostLink.trim() || undefined,
+      badges: mode === 'vendedor' ? ["Autor"] : [],
+      isPinned: false,
+      isNotice: isNotice,
+    });
+    setNewPostContent("");
+    setNewPostTitle("");
+    setNewPostImage("");
+    setNewPostVideo("");
+    setNewPostLink("");
+    setIsNotice(false);
+    setShowExtraFields(false);
   };
 
   const containerVariants = {
@@ -84,7 +109,7 @@ export default function Comunidade() {
 
       <div className="p-6 pt-12 flex justify-between items-center sticky top-0 bg-[#0B0B0F]/80 backdrop-blur-2xl z-40 border-b border-white/5 shadow-sm">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Comunidade</h1>
+          <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Comunidade</h1>
           <p className="text-zinc-400 text-sm mt-1 font-medium">
             {mode === "vendedor" ? "Gerencie a comunidade dos seus alunos." : "Interaja com outros alunos e professores."}
           </p>
@@ -111,14 +136,55 @@ export default function Comunidade() {
                 <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-[#FF5F00]/30 shadow-[0_0_15px_rgba(255,95,0,0.2)]">
                   <img src="https://i.pravatar.cc/150?img=11" alt="Profile" className="w-full h-full object-cover" />
                 </div>
-                <textarea
-                  placeholder="Compartilhe um aviso ou conteúdo com seus alunos..."
-                  className="w-full bg-transparent border-none outline-none text-white placeholder:text-zinc-500 text-base resize-none min-h-[60px] pt-2"
-                />
+                <div className="flex-1 space-y-3">
+                  {showExtraFields && (
+                    <input
+                      type="text"
+                      value={newPostTitle}
+                      onChange={(e) => setNewPostTitle(e.target.value)}
+                      placeholder="Título do post (opcional)"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder:text-zinc-500 text-sm focus:border-[#FF5F00]/50 outline-none transition-colors"
+                    />
+                  )}
+                  <textarea
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    placeholder="Compartilhe um aviso ou conteúdo com seus alunos..."
+                    className="w-full bg-transparent border-none outline-none text-white placeholder:text-zinc-500 text-base resize-none min-h-[60px] pt-2"
+                  />
+                  {showExtraFields && (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={newPostImage}
+                        onChange={(e) => setNewPostImage(e.target.value)}
+                        placeholder="URL da Imagem (opcional)"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder:text-zinc-500 text-sm focus:border-[#FF5F00]/50 outline-none transition-colors"
+                      />
+                      <input
+                        type="text"
+                        value={newPostVideo}
+                        onChange={(e) => setNewPostVideo(e.target.value)}
+                        placeholder="URL do Vídeo (opcional)"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder:text-zinc-500 text-sm focus:border-[#FF5F00]/50 outline-none transition-colors"
+                      />
+                      <input
+                        type="text"
+                        value={newPostLink}
+                        onChange={(e) => setNewPostLink(e.target.value)}
+                        placeholder="Link Externo (opcional)"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder:text-zinc-500 text-sm focus:border-[#FF5F00]/50 outline-none transition-colors"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
                 <div className="flex gap-2">
-                  <button className="text-zinc-400 hover:text-[#FF5F00] transition-colors p-2.5 rounded-2xl hover:bg-[#FF5F00]/10 flex items-center gap-2 group/btn">
+                  <button 
+                    onClick={() => setShowExtraFields(!showExtraFields)}
+                    className={`transition-colors p-2.5 rounded-2xl flex items-center gap-2 group/btn ${showExtraFields ? 'text-[#FF5F00] bg-[#FF5F00]/10' : 'text-zinc-400 hover:text-[#FF5F00] hover:bg-[#FF5F00]/10'}`}
+                  >
                     <ImageIcon size={20} className="group-hover/btn:scale-110 transition-transform" />
                   </button>
                   <button 
@@ -129,6 +195,7 @@ export default function Comunidade() {
                   </button>
                 </div>
                 <motion.button 
+                  onClick={handlePublish}
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-[#FF5F00] to-[#FF8C00] text-white px-6 py-2.5 rounded-2xl text-sm font-bold shadow-[0_5px_20px_rgba(255,95,0,0.4)] hover:shadow-[0_5px_25px_rgba(255,95,0,0.6)] transition-all flex items-center gap-2"
                 >
@@ -202,10 +269,13 @@ export default function Comunidade() {
                 {/* Seller Actions */}
                 {mode === "vendedor" && post.role === "Professor" ? (
                   <div className="flex gap-1">
-                    <button className="text-zinc-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+                    <button onClick={() => togglePin(post.id)} className="text-zinc-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+                      <Pin size={16} />
+                    </button>
+                    <button onClick={() => handleEdit(post)} className="text-zinc-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
                       <Edit2 size={16} />
                     </button>
-                    <button className="text-zinc-500 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
+                    <button onClick={() => deletePost(post.id)} className="text-zinc-500 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -217,14 +287,62 @@ export default function Comunidade() {
               </div>
 
               {/* Post Content */}
-              <p className="text-zinc-300 text-sm leading-relaxed mb-4 relative z-10">
-                {post.content}
-              </p>
+              {editingPostId === post.id ? (
+                <div className="mb-4 relative z-10">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-zinc-500 text-sm resize-none min-h-[80px] focus:border-[#FF5F00]/50 outline-none transition-colors"
+                  />
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button onClick={() => setEditingPostId(null)} className="text-zinc-400 hover:text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                      Cancelar
+                    </button>
+                    <button onClick={() => handleSaveEdit(post.id)} className="bg-[#FF5F00] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#e65500] transition-colors">
+                      Salvar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4 relative z-10">
+                  {post.title && (
+                    <h3 className="text-white font-bold text-lg mb-2">{post.title}</h3>
+                  )}
+                  <p className="text-zinc-300 text-sm leading-relaxed">
+                    {post.content}
+                  </p>
+                </div>
+              )}
 
-              {post.hasImage && (
+              {post.hasImage && post.image && (
                 <div className="w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-4 border border-white/5 shadow-inner relative z-10 group/img">
                   <img src={post.image} alt="Post attachment" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700" />
                 </div>
+              )}
+
+              {post.video && (
+                <div className="w-full aspect-video rounded-2xl overflow-hidden mb-4 border border-white/5 shadow-inner relative z-10">
+                  <iframe 
+                    src={post.video} 
+                    className="w-full h-full" 
+                    allowFullScreen 
+                    title="Post video"
+                  ></iframe>
+                </div>
+              )}
+
+              {post.link && (
+                <a 
+                  href={post.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 mb-4 transition-colors relative z-10"
+                >
+                  <div className="flex items-center gap-2 text-[#6C2BFF]">
+                    <Sparkles size={16} />
+                    <span className="text-sm font-medium truncate">{post.link}</span>
+                  </div>
+                </a>
               )}
 
               {/* Post Actions */}
@@ -235,14 +353,15 @@ export default function Comunidade() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${likedPosts.includes(post.id) ? 'bg-pink-500/10 text-pink-500' : 'text-zinc-400 hover:bg-white/5 hover:text-pink-500'}`}
                 >
                   <Heart size={18} className={likedPosts.includes(post.id) ? 'fill-pink-500' : ''} />
-                  <span className="text-xs font-bold">{post.likes + (likedPosts.includes(post.id) ? 1 : 0)}</span>
+                  <span className="text-xs font-bold">{post.likes}</span>
                 </motion.button>
                 <motion.button 
+                  onClick={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
                   whileTap={{ scale: 0.9 }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-zinc-400 hover:bg-[#6C2BFF]/10 hover:text-[#6C2BFF] transition-all"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${expandedPostId === post.id ? 'bg-[#6C2BFF]/10 text-[#6C2BFF]' : 'text-zinc-400 hover:bg-[#6C2BFF]/10 hover:text-[#6C2BFF]'}`}
                 >
                   <MessageSquare size={18} />
-                  <span className="text-xs font-bold">{post.comments}</span>
+                  <span className="text-xs font-bold">{post.comments.length}</span>
                 </motion.button>
                 <motion.button 
                   whileTap={{ scale: 0.9 }}
@@ -251,6 +370,101 @@ export default function Comunidade() {
                   <Share2 size={18} />
                 </motion.button>
               </div>
+
+              {/* Comments Section */}
+              {expandedPostId === post.id && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-4 pt-4 border-t border-white/5 relative z-10"
+                >
+                  {/* Comments List */}
+                  <div className="space-y-4 mb-4">
+                    {post.comments.map((comment) => (
+                      <div key={comment.id} className="space-y-2">
+                        <div className="flex gap-3">
+                          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-white/10">
+                            <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 bg-white/5 rounded-2xl p-3 border border-white/5">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-bold text-white text-sm">{comment.author}</span>
+                              <span className="text-zinc-500 text-[10px]">{comment.time}</span>
+                            </div>
+                            <p className="text-zinc-300 text-sm">{comment.content}</p>
+                            <div className="flex gap-3 mt-2">
+                              <button onClick={() => likeComment(post.id, comment.id)} className="text-zinc-500 hover:text-pink-500 text-xs font-bold flex items-center gap-1 transition-colors">
+                                <Heart size={12} /> {comment.likes > 0 && comment.likes}
+                              </button>
+                              <button onClick={() => setReplyingTo({ postId: post.id, commentId: comment.id, author: comment.author })} className="text-zinc-500 hover:text-white text-xs font-bold transition-colors">
+                                Responder
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Replies */}
+                        {comment.replies && comment.replies.length > 0 && (
+                          <div className="pl-11 space-y-3 mt-2">
+                            {comment.replies.map((reply) => (
+                              <div key={reply.id} className="flex gap-3">
+                                <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-white/10">
+                                  <img src={reply.avatar} alt={reply.author} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="flex-1 bg-white/5 rounded-2xl p-3 border border-white/5">
+                                  <div className="flex justify-between items-start mb-1">
+                                    <span className="font-bold text-white text-xs">{reply.author}</span>
+                                    <span className="text-zinc-500 text-[10px]">{reply.time}</span>
+                                  </div>
+                                  <p className="text-zinc-300 text-xs">{reply.content}</p>
+                                  <div className="flex gap-3 mt-2">
+                                    <button onClick={() => likeComment(post.id, reply.id)} className="text-zinc-500 hover:text-pink-500 text-[10px] font-bold flex items-center gap-1 transition-colors">
+                                      <Heart size={10} /> {reply.likes > 0 && reply.likes}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Comment Input */}
+                  <div className="flex gap-3 items-end">
+                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-white/10 mb-1">
+                      <img src="https://i.pravatar.cc/150?img=11" alt="Me" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 relative">
+                      {replyingTo && replyingTo.postId === post.id && (
+                        <div className="absolute -top-6 left-2 text-xs text-[#6C2BFF] flex items-center gap-2">
+                          <span>Respondendo a <span className="font-bold">{replyingTo.author}</span></span>
+                          <button onClick={() => setReplyingTo(null)} className="text-zinc-500 hover:text-white">✕</button>
+                        </div>
+                      )}
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-1 flex items-center focus-within:border-[#6C2BFF]/50 transition-colors">
+                        <input
+                          type="text"
+                          value={newCommentContent}
+                          onChange={(e) => setNewCommentContent(e.target.value)}
+                          placeholder={replyingTo && replyingTo.postId === post.id ? `Responder a ${replyingTo.author}...` : "Escreva um comentário..."}
+                          className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-zinc-500 text-sm px-3 py-2"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handlePublishComment(post.id);
+                          }}
+                        />
+                        <button 
+                          onClick={() => handlePublishComment(post.id)}
+                          className="bg-[#6C2BFF] text-white p-2 rounded-xl hover:bg-[#5b24d8] transition-colors"
+                        >
+                          <Send size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
           ))}
         </motion.div>

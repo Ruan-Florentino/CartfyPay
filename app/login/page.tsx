@@ -3,13 +3,25 @@
 import { motion } from "motion/react";
 import { Mail, Lock, ArrowRight, Apple } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Login() {
+  const { signIn, user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !loading) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
+
   return (
     <div className="min-h-screen bg-[#0B0B0F] flex flex-col justify-center p-6 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#FF6A00]/20 rounded-full blur-[100px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#FF5F00]/20 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#6C2BFF]/20 rounded-full blur-[100px]"></div>
       </div>
 
@@ -21,10 +33,10 @@ export default function Login() {
       >
         {/* Logo */}
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-tr from-[#FF6A00] to-[#FF8C00] rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(255,106,0,0.4)]">
-            <span className="text-white font-black text-3xl tracking-tighter">C</span>
+          <div className="w-16 h-16 bg-gradient-to-tr from-[#FF5F00] to-[#FF8C00] rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(255,106,0,0.4)]">
+            <span className="text-white font-bold tracking-[-0.02em] text-3xl tracking-tighter">C</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-white mb-2">Cartfy</h1>
+          <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white mb-2">Cartfy</h1>
           <p className="text-zinc-400 text-sm">A plataforma premium para seus infoprodutos.</p>
         </div>
 
@@ -37,7 +49,7 @@ export default function Login() {
               <input
                 type="email"
                 placeholder="seu@email.com"
-                className="w-full bg-[#111118] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A00] transition-colors text-base shadow-lg"
+                className="w-full bg-[#111118] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FF5F00] transition-colors text-base shadow-lg"
               />
             </div>
           </div>
@@ -49,13 +61,13 @@ export default function Login() {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="w-full bg-[#111118] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A00] transition-colors text-base shadow-lg"
+                className="w-full bg-[#111118] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FF5F00] transition-colors text-base shadow-lg"
               />
             </div>
           </div>
 
           <div className="flex justify-end">
-            <button className="text-[#FF6A00] text-sm font-semibold hover:underline">
+            <button className="text-[#FF5F00] text-sm font-semibold hover:underline">
               Esqueceu a senha?
             </button>
           </div>
@@ -64,7 +76,7 @@ export default function Login() {
         {/* Action Buttons */}
         <div className="space-y-4 pt-4">
           <Link href="/">
-            <button className="w-full bg-gradient-to-r from-[#FF6A00] to-[#FF8C00] text-white font-bold text-lg py-4 rounded-2xl shadow-[0_8px_30px_rgba(255,106,0,0.4)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <button className="w-full bg-gradient-to-r from-[#FF5F00] to-[#FF8C00] text-white font-bold text-lg py-4 rounded-2xl shadow-[0_8px_30px_rgba(255,106,0,0.4)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
               Entrar na conta <ArrowRight size={20} />
             </button>
           </Link>
@@ -76,7 +88,10 @@ export default function Login() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <button className="bg-[#111118] border border-white/10 py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold text-white hover:bg-zinc-900 transition-colors shadow-lg">
+            <button 
+              onClick={signIn}
+              className="bg-[#111118] border border-white/10 py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold text-white hover:bg-zinc-900 transition-colors shadow-lg"
+            >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -93,7 +108,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-zinc-500 text-sm mt-8">
-          Ainda não tem uma conta? <Link href="#" className="text-[#FF6A00] font-bold hover:underline">Criar conta</Link>
+          Ainda não tem uma conta? <Link href="#" className="text-[#FF5F00] font-bold hover:underline">Criar conta</Link>
         </p>
       </motion.div>
     </div>

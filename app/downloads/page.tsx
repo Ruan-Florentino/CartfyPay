@@ -2,10 +2,20 @@
 
 import { motion } from "motion/react";
 import { Download, FileText, FileSpreadsheet, FileArchive, Search, FolderOpen, ArrowDownToLine, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMode } from "@/lib/mode-context";
+import { useRouter } from "next/navigation";
 
 export default function Downloads() {
+  const { mode } = useMode();
+  const router = useRouter();
   const [downloading, setDownloading] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (mode === 'vendedor') {
+      router.push('/');
+    }
+  }, [mode, router]);
 
   const downloads = [
     { id: 1, title: "Planilha de Precificação", type: "excel", size: "2.4 MB", course: "Mestre em Vendas", date: "Há 2 dias", downloaded: false },
@@ -57,7 +67,7 @@ export default function Downloads() {
 
       <div className="p-6 pt-12 flex justify-between items-center sticky top-0 bg-[#0B0B0F]/80 backdrop-blur-xl z-40 border-b border-white/5 shadow-sm">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Downloads</h1>
+          <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Downloads</h1>
           <p className="text-zinc-400 text-sm mt-1 font-medium">Materiais complementares dos seus cursos.</p>
         </div>
         <motion.div 
@@ -74,7 +84,7 @@ export default function Downloads() {
           animate={{ opacity: 1, y: 0 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-[#6C2BFF]/20 to-[#FF6A00]/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#6C2BFF]/20 to-[#FF5F00]/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#6C2BFF] transition-colors" size={20} />
             <input

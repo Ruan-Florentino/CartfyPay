@@ -1,0 +1,109 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: checkouts
+    // Document ID: {checkoutId}
+    // Fields:
+    //   - userId: string (required) - Owner of the checkout
+    //   - config: map (required) - Checkout configuration
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - email: string (required)
+    //   - role: string (required) - 'vendedor' or 'aluno'
+    //
+    // Collection: users/{userId}/transactions
+    // Document ID: {transactionId}
+    // Fields:
+    //   - id: string
+    //   - cliente: string
+    //   - produto: string
+    //   - valor: number
+    //   - status: string
+    //   - metodo: string
+    //   - createdAt: timestamp
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+
+    function isOwner(userId) {
+       return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+       return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function uidUnchanged() {
+       return !('userId' in request.resource.data) ||
+         request.resource.data.userId == request.auth.uid;
+    }
+
+    function hasRequiredFields(fields) {
+       return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+       return email is string &&
+         email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // Domain Validators
+    function isValidCheckout(data) {
+      return hasRequiredFields(['userId', 'config']) &&
+             data.userId is string &&
+             data.config is map;
+    }
+
+    function isValidUser(data) {
+      return hasRequiredFields(['email', 'role']) &&
+             isValidEmail(data.email) &&
+             data.role in ['vendedor', 'aluno'];
+    }
+
+    match /checkouts/{checkoutId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidCheckout(request.resource.data) && request.resource.data.userId == request.auth.uid;
+      allow update: if isDocOwner() && isValidCheckout(request.resource.data) && request.resource.data.userId == request.auth.uid;
+      allow delete: if isDocOwner();
+    }
+
+    match /community_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // For prototype, allow any authenticated user to create/update posts, comments, likes
+    }
+
+    match /courseProgress/{progressId} {
+      allow read, write: if isAuthenticated() && progressId.matches(request.auth.uid + "_.*");
+    }
+
+    match /courseEnrollments/{enrollmentId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Should only be written by the backend webhook
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role; // Prevent role escalation
+      
+      match /transactions/{transactionId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}

@@ -47,7 +47,7 @@ export default function Notificacoes() {
     switch (tipo) {
       case "venda": return <DollarSign size={20} className="text-emerald-400" />;
       case "aluno": return <UserPlus size={20} className="text-[#6C2BFF]" />;
-      case "saque": return <CheckCircle2 size={20} className="text-[#FF6A00]" />;
+      case "saque": return <CheckCircle2 size={20} className="text-[#FF5F00]" />;
       default: return <Bell size={20} className="text-zinc-400" />;
     }
   };
@@ -56,7 +56,7 @@ export default function Notificacoes() {
     switch (tipo) {
       case "venda": return "bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
       case "aluno": return "bg-[#6C2BFF]/10 border-[#6C2BFF]/20 shadow-[0_0_15px_rgba(108,43,255,0.2)]";
-      case "saque": return "bg-[#FF6A00]/10 border-[#FF6A00]/20 shadow-[0_0_15px_rgba(255,106,0,0.2)]";
+      case "saque": return "bg-[#FF5F00]/10 border-[#FF5F00]/20 shadow-[0_0_15px_rgba(255,106,0,0.2)]";
       default: return "bg-zinc-500/10 border-zinc-500/20";
     }
   };
@@ -105,7 +105,7 @@ export default function Notificacoes() {
             </motion.div>
           </Link>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Notificações</h1>
+            <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Notificações</h1>
             <p className="text-zinc-400 text-sm mt-1 font-medium">Fique por dentro de tudo</p>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function Notificacoes() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={marcarTodasLidas}
-          className="flex items-center gap-1.5 text-xs font-bold text-[#FF6A00] bg-[#FF6A00]/10 px-3 py-1.5 rounded-full border border-[#FF6A00]/20 hover:bg-[#FF6A00]/20 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-bold text-[#FF5F00] bg-[#FF5F00]/10 px-3 py-1.5 rounded-full border border-[#FF5F00]/20 hover:bg-[#FF5F00]/20 transition-colors"
         >
           <CheckCheck size={14} />
           Lidas
@@ -149,12 +149,12 @@ export default function Notificacoes() {
                 className={`p-4 rounded-3xl border shadow-lg relative overflow-hidden group cursor-pointer transition-all duration-300 ${
                   notificacao.lida 
                     ? 'bg-[#111118] border-white/5 opacity-70 hover:opacity-100' 
-                    : 'bg-gradient-to-br from-[#111118] to-[#1a1a24] border-[#FF6A00]/30 shadow-[0_5px_20px_rgba(255,106,0,0.1)]'
+                    : 'bg-gradient-to-br from-[#111118] to-[#1a1a24] border-[#FF5F00]/30 shadow-[0_5px_20px_rgba(255,106,0,0.1)]'
                 }`}
               >
                 {/* Unread Indicator Glow */}
                 {!notificacao.lida && (
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#FF6A00] to-[#6C2BFF] shadow-[0_0_10px_#FF6A00]"></div>
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#FF5F00] to-[#6C2BFF] shadow-[0_0_10px_#FF5F00]"></div>
                 )}
                 
                 <div className="flex gap-4">
@@ -174,7 +174,7 @@ export default function Notificacoes() {
                     <div className="flex items-center justify-between">
                       {notificacao.valor ? (
                         <div className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
-                          <span className="text-emerald-400 font-black text-xs">{notificacao.valor}</span>
+                          <span className="text-emerald-400 font-bold tracking-[-0.02em] text-xs">{notificacao.valor}</span>
                         </div>
                       ) : <div></div>}
                       

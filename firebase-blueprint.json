@@ -1,0 +1,22 @@
+{
+  "entities": {
+    "CheckoutConfig": {
+      "title": "CheckoutConfig",
+      "description": "Configuration for a checkout page",
+      "type": "object",
+      "properties": {
+        "headline": { "type": "string" },
+        "subheadline": { "type": "string" },
+        "price": { "type": "number" },
+        "title": { "type": "string" }
+      },
+      "required": ["headline", "price", "title"]
+    }
+  },
+  "firestore": {
+    "/checkouts/{checkoutId}": {
+      "schema": "CheckoutConfig",
+      "description": "Stores checkout configurations"
+    }
+  }
+}

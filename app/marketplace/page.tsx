@@ -84,7 +84,7 @@ export default function Marketplace() {
             </motion.div>
           </Link>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Marketplace</h1>
+            <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Marketplace</h1>
             <p className="text-zinc-400 text-sm mt-1 font-medium">Encontre produtos para se afiliar</p>
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function Marketplace() {
                   <div className="flex items-center justify-between mt-2">
                     <div>
                       <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Preço</p>
-                      <p className="text-white font-black text-sm sm:text-base">{course.price}</p>
+                      <p className="text-white font-bold tracking-[-0.02em] text-sm sm:text-base">{course.price}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-emerald-500/70 text-[10px] uppercase font-bold tracking-wider">Comissão</p>
-                      <p className="text-emerald-500 font-black text-sm sm:text-base">{course.commission}</p>
+                      <p className="text-emerald-500 font-bold tracking-[-0.02em] text-sm sm:text-base">{course.commission}</p>
                     </div>
                   </div>
                 </div>

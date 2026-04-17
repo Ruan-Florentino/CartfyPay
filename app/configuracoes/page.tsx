@@ -47,7 +47,7 @@ export default function Settings() {
           </motion.button>
         </Link>
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white">Configurações</h1>
+          <h1 className="text-2xl font-bold tracking-[-0.02em] tracking-tight text-white">Configurações</h1>
           <p className="text-zinc-400 text-xs mt-0.5 font-medium">Preferências do app</p>
         </div>
       </div>

@@ -39,7 +39,7 @@ export function MiniPlayer() {
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Link href="/cursos/1">
-                <button className="w-12 h-12 bg-[#FF6A00] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,106,0,0.6)] pl-1 hover:scale-110 transition-transform">
+                <button className="w-12 h-12 bg-[#FF5F00] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,95,0,0.6)] pl-1 hover:scale-110 transition-transform">
                   <Play size={20} className="text-white" fill="currentColor" />
                 </button>
               </Link>
@@ -67,7 +67,7 @@ export function MiniPlayer() {
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${currentLesson.progress}%` }}
-                  className="h-full bg-[#FF6A00]"
+                  className="h-full bg-[#FF5F00]"
                 />
               </div>
               <span className="text-[10px] font-bold text-zinc-400">{currentLesson.progress}%</span>

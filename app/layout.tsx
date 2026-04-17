@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { BottomNav } from "@/components/layout/bottom-nav";
-import { TopHeader } from "@/components/layout/top-header";
 import { ModeProvider } from "@/lib/mode-context";
+import { AuthProvider } from "@/contexts/auth-context";
 import { PlayerProvider } from "@/contexts/player-context";
-import { MiniPlayer } from "@/components/mini-player";
+import { CommunityProvider } from "@/contexts/community-context";
+import { NotificationProvider } from "@/contexts/notification-context";
+import { ModeWrapper } from "@/components/layout/mode-wrapper";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-heading" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -15,7 +17,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#0B0B0F",
+  themeColor: "#000000",
 };
 
 export const metadata: Metadata = {
@@ -36,21 +38,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className={`${inter.variable} font-sans bg-black text-white antialiased`}>
-        <ModeProvider>
-          <PlayerProvider>
-            <div className="flex min-h-screen justify-center items-center bg-zinc-950 sm:p-4">
-              <div className="relative w-full max-w-[420px] h-[100dvh] sm:h-[850px] bg-[#0B0B0F] sm:rounded-[2.5rem] sm:border-[8px] sm:border-zinc-900 overflow-hidden shadow-2xl flex flex-col">
-                <TopHeader />
-                <main className="flex-1 overflow-y-auto no-scrollbar relative pb-32">
-                  {children}
-                </main>
-                <MiniPlayer />
-                <BottomNav />
-              </div>
-            </div>
-          </PlayerProvider>
-        </ModeProvider>
+      <body className={`${inter.variable} ${plusJakartaSans.variable} font-sans bg-black text-white antialiased`}>
+        <AuthProvider>
+          <ModeProvider>
+            <PlayerProvider>
+              <NotificationProvider>
+                <CommunityProvider>
+                  <ModeWrapper>{children}</ModeWrapper>
+                </CommunityProvider>
+              </NotificationProvider>
+            </PlayerProvider>
+          </ModeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
