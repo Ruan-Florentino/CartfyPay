@@ -49,10 +49,10 @@ export default function CheckoutBuilder() {
     
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/generate-product', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt })
+        body: JSON.stringify({ action: "generate-product", input: { prompt: aiPrompt } })
       });
       
       if (!response.ok) throw new Error('Failed to generate');
@@ -79,10 +79,10 @@ export default function CheckoutBuilder() {
   const handleGenerateAd = async () => {
     setIsGeneratingAd(true);
     try {
-      const response = await fetch('/api/generate-ad', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config })
+        body: JSON.stringify({ action: "generate-ad", input: { config } })
       });
       
       if (!response.ok) throw new Error('Failed to generate ad');

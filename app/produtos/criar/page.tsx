@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useAuth } from "@/contexts/auth-context";
-import { GoogleGenAI } from "@google/genai";
+import { useToast } from "@/components/ui/toast";
 
 export default function CriarProduto() {
+  const { error, success } = useToast();
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const router = useRouter();
@@ -41,48 +42,36 @@ export default function CriarProduto() {
     if (!aiPrompt) return;
     setLoadingAi(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
-      const prompt = `
-        Crie um produto digital focado em alta conversão. O nicho/ideia do usuário é: "${aiPrompt}".
-        Você deve formatar a saída estritamente em um JSON sem formatação markdown (apenas chaves) no formato:
-        {
-          "nome": "Título Magnético do Produto",
-          "tipo": "Um dos seguintes: Curso Online, E-book, Mentoria, Assinatura",
-          "preco": "Valor numérico real em string, ex: 197,00",
-          "garantia": "Um dos seguintes: 7 dias, 15 dias, 30 dias",
-          "descricao": "Uma super copy foda descritiva do produto que gere urgência",
-          "imagem": "URL simulada de capa gerada em https://picsum.photos/seed/PRODUTO/400/600 onde PRODUTO é uma palavra que represente o nicho",
-          "afiliadosHabilitado": true,
-          "comissao": "Porcentagem da comissão atrativa, número real em string, ex: 50"
-        }
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-            temperature: 0.8,
-            responseMimeType: "application/json"
-        }
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: "generate-product", input: { prompt: aiPrompt } })
       });
       
-      const json = JSON.parse(response.text || "{}");
-      if (json.nome) {
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Erro na geração por IA");
+      }
+
+      const generatedProduct = data.produto || data;
+
+      if (generatedProduct.nome) {
          setFormData({
-            nome: json.nome || formData.nome,
-            tipo: json.tipo || formData.tipo,
-            preco: json.preco || formData.preco,
-            garantia: json.garantia || formData.garantia,
-            descricao: json.descricao || formData.descricao,
-            imagem: json.imagem || formData.imagem,
-            afiliadosHabilitado: json.afiliadosHabilitado || formData.afiliadosHabilitado,
-            comissao: json.comissao || formData.comissao
+            nome: generatedProduct.nome || formData.nome,
+            tipo: generatedProduct.tipo || formData.tipo,
+            preco: generatedProduct.preco?.toString() || formData.preco,
+            garantia: formData.garantia,
+            descricao: generatedProduct.descricao || formData.descricao,
+            imagem: generatedProduct.imagem || formData.imagem,
+            afiliadosHabilitado: generatedProduct.afiliados || formData.afiliadosHabilitado,
+            comissao: formData.comissao
          });
          setStep(2); // Avança pra mostrar que preencheu
       }
     } catch (e) {
       console.error(e);
-      alert("Falha ao gerar produto.");
+      error("Falha ao gerar produto com IA.");
     } finally {
       setLoadingAi(false);
     }
@@ -98,7 +87,7 @@ export default function CriarProduto() {
 
   const handleSave = async () => {
     if (!user) {
-      alert("Você precisa estar logado para criar um produto.");
+      error("Você precisa estar logado para criar um produto.");
       return;
     }
 
@@ -145,10 +134,11 @@ export default function CriarProduto() {
         }
       });
 
+      success("Produto e checkout criados com sucesso!");
       router.push('/produtos');
-    } catch (error) {
-      console.error("Erro ao salvar produto:", error);
-      alert("Erro ao salvar produto. Tente novamente.");
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+      error("Erro ao salvar produto. Tente novamente.");
     } finally {
       setLoading(false);
     }

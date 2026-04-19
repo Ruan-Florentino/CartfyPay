@@ -7,6 +7,7 @@ import { PlayerProvider } from "@/contexts/player-context";
 import { CommunityProvider } from "@/contexts/community-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { ModeWrapper } from "@/components/layout/mode-wrapper";
+import { ToastProvider } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-heading" });
@@ -45,6 +46,7 @@ export default function RootLayout({
               <NotificationProvider>
                 <CommunityProvider>
                   <ModeWrapper>{children}</ModeWrapper>
+                  <ToastProvider />
                 </CommunityProvider>
               </NotificationProvider>
             </PlayerProvider>

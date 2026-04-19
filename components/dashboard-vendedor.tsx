@@ -31,10 +31,10 @@ export function DashboardVendedor() {
       if (metricas.faturamento === 0) return; // Don't fetch if no data
       setLoadingInsights(true);
       try {
-        const response = await fetch('/api/dashboard-insights', {
+        const response = await fetch('/api/gemini', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ metricas })
+          body: JSON.stringify({ action: "dashboard-insights", input: { metricas } })
         });
         const data = await response.json();
         if (data.insights) {

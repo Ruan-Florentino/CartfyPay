@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default function Afiliados() {
   const [copied, setCopied] = useState(false);
@@ -69,30 +70,19 @@ export default function Afiliados() {
       {/* Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-gradient-to-b from-[#FF5F00]/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
 
-      {/* Header */}
-      <div className="p-6 pt-12 flex justify-between items-center sticky top-0 bg-[#0B0B0F]/80 backdrop-blur-xl z-40 border-b border-white/5 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link href="/perfil">
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 bg-[#111118] rounded-2xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] flex items-center justify-center hover:bg-white/5 transition-colors"
-            >
-              <ChevronLeft size={24} className="text-zinc-300" />
-            </motion.div>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-[-0.02em] tracking-tight text-white">Afiliados</h1>
-            <p className="text-zinc-400 text-sm mt-1 font-medium">Gerencie seus parceiros</p>
-          </div>
-        </div>
-        <motion.button 
-          whileTap={{ scale: 0.9 }}
-          className="w-12 h-12 bg-[#111118] rounded-2xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] flex items-center justify-center hover:bg-white/5 transition-colors"
-        >
-          <Users size={24} className="text-zinc-300" />
-        </motion.button>
-      </div>
+      <PageHeader 
+        title="Afiliados"
+        subtitle="Gerencie seus parceiros"
+        backHref="/perfil"
+        rightElement={
+          <motion.button 
+            whileTap={{ scale: 0.9 }}
+            className="w-12 h-12 bg-[#111118] rounded-2xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] flex items-center justify-center hover:bg-white/5 transition-colors"
+          >
+            <Users size={24} className="text-zinc-300" />
+          </motion.button>
+        }
+      />
 
       <motion.div 
         variants={containerVariants}
